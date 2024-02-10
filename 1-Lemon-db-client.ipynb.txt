@@ -1,0 +1,132 @@
+LittleLemonDB Capstone Project
+Creating a database client for Little Lemon using the Mysql python connector API/driver to interact with Little Lemon's database
+Updating and deleting records in a MySQL database using Python
+# Use to install mysql connector API if not installed
+# !pip install mysql-connector-python
+# use to import the mysql connector API
+import mysql.connector as connector
+Task 1
+In the previous exercise you created a Python environment. In the first task of this exercise, you are tasked with extending the environment to connect with your database and interact with the data it holds.
+
+Your first step is to import the connector module, enter your user details and connect with the database (Hint: you can use an alias when importing the module).
+
+This gives you access to all the functionality available from the connector API, which can be accessed through the variable named connector (or whichever alias you choose).
+
+# Establish connection b/w Python and MySQL database via connector API
+connection=connector.connect(
+                             user="YOUR_USERNAME", # use your own
+                             password="YOUR_PASSWORD", # use your own
+                             database="LittleLemonDB"
+                            )
+# Create a cursor object to communicate with entire MySQL database
+cursor = connection.cursor()
+Once, the connection is established, and you have a cursor object, you can select the database little_lemon using the code below and work with the respective table to accomplish the required tasks.
+
+# Set the little_lemon database for use 
+cursor.execute("USE LittleLemonDB")
+
+# Confirm the database in use
+connection.database
+'littlelemondb'
+Task 2
+In this second task, you now need to query the database to show all tables within the database.
+
+# Task 1 show your database tables
+
+# create SQL query as a string object and add to a variable
+show_tables_query = """SHOW tables""" 
+
+# execute the query
+cursor.execute(show_tables_query)
+
+# fetch the results from the cursor
+results = cursor.fetchall()
+
+# Retrieve the column names
+cols = cursor.column_names[1:]
+
+# print column names and the records from results using for loop
+print("Tables in the LittleLemonDB database:")
+print("--------------------------------------")
+print(cols)
+for result in results:
+    print(result)
+Tables in the LittleLemonDB database:
+--------------------------------------
+()
+('Bookings',)
+('Customers',)
+('Employees',)
+('MenuItems',)
+('Menus',)
+('Orders',)
+Testing connection and database
+### Testing connection and database ###
+
+orders_query = """SELECT * FROM Customers""" 
+
+# execute the query
+cursor.execute(orders_query)
+
+# fetch the results from the cursor
+results = cursor.fetchall()
+
+# Retrieve the column names
+cols = cursor.column_names
+
+# print column names and the records from results using for loop
+print(cols)
+for result in results:
+    print(result)
+('CustomerID', 'FullName', 'ContactNumber')
+(1, 'Vanessa McCarthy', 111111)
+(2, 'Marcos Romero', 222222)
+(3, 'Anna Iversen', 333333)
+(4, 'Joakim Iversen', 444444)
+(5, 'Diana Pinto', 555555)
+(6, 'Hiroki Yamane', 666666)
+Task 3
+Query with table JOIN
+
+For the third and final task, Little Lemon need you to return specific details from your database. They require the full name and contact details for every customer that has placed an order greater than $60 for a promotional campaign.
+
+ordersgt60 = """
+SELECT c.CustomerID, c.FullName, c.ContactNumber, o.TotalCost
+FROM Orders o
+INNER JOIN Customers c
+  ON o.CustomerID = c.CustomerID
+WHERE o.TotalCost > 60
+"""
+
+# execute the query
+cursor.execute(ordersgt60)
+
+# fetch results from the cursor, store in  a variable
+results = cursor.fetchall()
+
+# retrieve column names from the cursor
+cols = cursor.column_names
+
+# print the cols and results
+print("Customers with orders greater than $60:")
+print("---------------------------------------")
+print(cols)
+for result in results:
+    print(result)
+Customers with orders greater than $60:
+---------------------------------------
+('CustomerID', 'FullName', 'ContactNumber', 'TotalCost')
+(3, 'Anna Iversen', 333333, 250)
+(4, 'Joakim Iversen', 444444, 200)
+(1, 'Vanessa McCarthy', 111111, 100)
+(2, 'Marcos Romero', 222222, 150)
+(6, 'Hiroki Yamane', 666666, 90)
+# Let's close the cursor and the connection
+if connection.is_connected():
+    cursor.close()
+    print("The cursor is closed.")
+    connection.close()
+    print("MySQL connection is closed.")
+else:
+    print("Connection is already closed.")
+Connection is already closed.
